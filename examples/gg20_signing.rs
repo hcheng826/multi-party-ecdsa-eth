@@ -34,9 +34,6 @@ struct Cli {
 #[tokio::main]
 async fn main() -> Result<()> {
     let args: Cli = Cli::from_args();
-    println!("args.parties {:?}", &args.parties);
-    println!("args.data_to_sign {:?}", args.data_to_sign.clone());
-    println!("args.room {:?}", args.room.clone());
 
     let local_share = tokio::fs::read(args.local_share)
         .await
@@ -104,52 +101,33 @@ pub async fn sign(
     parties: Vec<u16>,
     address: surf::Url,
     room: String,
-) -> Result<()> {
-    println!("sign called - local_share - 104: {:?}:", local_share);
-    println!("args.parties {:?}", &parties);
-    println!("args.data_to_sign {:?}", data_to_sign.clone());
-    println!("args.room {:?}", room.clone());
+) -> Result<String> {
     let local_share = tokio::fs::read(local_share)
         .await
         .context("cannot read local share")?;
 
-    // println!("local_share - 109: {:?}:", local_share);
     let local_share = serde_json::from_slice(&local_share).context("parse local share")?;
     let number_of_parties = parties.len();
-
-    // println!("address: {:?}", address);
-    println!("room: {:?}", room);
 
     let (i, incoming, outgoing) = join_computation(address.clone(), &format!("{}-offline", room))
         .await
         .context("join offline computation")?;
 
-    println!("after offline join_computation");
-
     let incoming = incoming.fuse();
-
-    println!("after incoming.fuse line 131");
 
     tokio::pin!(incoming);
     tokio::pin!(outgoing);
 
-    println!("after tokio::pin! line 136");
-
     let signing = OfflineStage::new(i, parties, local_share)?;
 
-    println!("signing: {:?}", signing);
     let completed_offline_stage = AsyncProtocol::new(signing, incoming, outgoing)
         .run()
         .await
         .map_err(|e| anyhow!("protocol execution terminated with error: {}", e))?;
 
-    println!("completed_offline_stage");
-
     let (i, incoming, outgoing) = join_computation(address, &format!("{}-online", room))
         .await
         .context("join online computation")?;
-
-    println!("after online join_computation");
 
     tokio::pin!(incoming);
     tokio::pin!(outgoing);
@@ -178,16 +156,11 @@ pub async fn sign(
         .try_collect()
         .await?;
 
-    println!("partial_signatures: {:?}", partial_signatures);
-
     let signature = signing
         .complete(&partial_signatures)
         .context("online stage failed")?;
 
-    println!("signature: {:?}", signature);
-
     let signature = serde_json::to_string(&signature).context("serialize signature")?;
-    println!("{}", signature);
 
-    Ok(())
+    Ok(signature)
 }

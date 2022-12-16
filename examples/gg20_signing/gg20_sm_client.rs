@@ -18,7 +18,6 @@ pub async fn join_computation<M>(
 where
     M: Serialize + DeserializeOwned,
 {
-    println!("join computation called! room-id: {:?}", room_id);
     let client = SmClient::new(address, room_id).context("construct SmClient")?;
 
     // Construct channel of incoming messages

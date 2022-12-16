@@ -1,29 +1,31 @@
 #[macro_use]
 extern crate rocket;
 mod gg20_signing;
+use rocket::serde::{json::Json, Deserialize};
 use std::path::PathBuf;
-use futures::executor::block_on;
 
 #[get("/")]
 fn index() -> &'static str {
     "Hello, world!"
 }
 
-#[post("/", format = "plain", data = "<serialized_tx>")]
-async fn sign(serialized_tx: String) -> &'static str {
-    println!("{}", serialized_tx);
-    // thread::spawn( move || {
-        // println!("thread spawned");
-        let a = gg20_signing::sign(
-            serialized_tx.to_owned(),
-            PathBuf::from(r"./examples/local-share2.json"),
-            vec![1, 2],
-            surf::Url::parse("http://localhost:8000").unwrap(),
-            "default-signing".to_string(),
-        );
-        block_on(a);
+#[derive(Deserialize)]
+#[serde(crate = "rocket::serde")]
+struct SignReq {
+    msg: String,
+    room_id: String,
+}
 
-    println!("signed 27!!!!!");
+#[post("/", format = "json", data = "<sign_req>")]
+async fn sign(sign_req: Json<SignReq>) -> &'static str {
+    let _sign_result = gg20_signing::sign(
+        sign_req.msg.to_string(),
+        PathBuf::from(r"./examples/local-share2.json"),
+        vec![1, 2],
+        surf::Url::parse("http://localhost:8000").unwrap(),
+        sign_req.room_id.to_string(),
+    )
+    .await;
 
     "Server Good"
 }
@@ -31,7 +33,7 @@ async fn sign(serialized_tx: String) -> &'static str {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let figment = rocket::Config::figment().merge(("port", 8002));
-    rocket::custom(figment)
+    let _rocket_instance = rocket::custom(figment)
         .mount("/", routes![index])
         .mount("/sign", routes![sign])
         .launch()
