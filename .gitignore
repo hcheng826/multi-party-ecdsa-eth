@@ -17,3 +17,5 @@ signature
 
 local-share*
 
+node_modules
+

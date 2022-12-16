@@ -1,7 +1,10 @@
 # Multi-party ECDSA for Ethereum transaction prototype
 
+## Introdutcion
+
 4 components
-1. Node.js server
+
+1. Node.js client
    1. parse the tx data and send it to client Rust server
    1. get the response and send_rawTransaction
 1. client Rust server
@@ -11,6 +14,15 @@
 1. service Rust server
    1. take the tx data and talk to state machine manager to complete the signature
 1. state machine manager server
+
+## How to send transaction
+
+1. at the root directory of the repo, start the servers for last 3 items above (in different terminals)
+   1. `cargo run --example client`
+   2. `cargo run --example server`
+   3. `cargo run --example gg20_sm_manager`
+2. open a new terminal, cd into `examples/` and run `node sendTx.cjs`
+   1. configure tx data in `sendTx.cjs` if needed
 
 # Multi-party ECDSA (original README starts here)
 
