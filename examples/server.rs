@@ -18,14 +18,20 @@ struct SignReq {
 
 #[post("/", format = "json", data = "<sign_req>")]
 async fn sign(sign_req: Json<SignReq>) -> &'static str {
-    let _sign_result = gg20_signing::sign(
+    let sign_result = match gg20_signing::sign(
         sign_req.msg.to_string(),
         PathBuf::from(r"./examples/local-share2.json"),
         vec![1, 2],
         surf::Url::parse("http://localhost:8000").unwrap(),
         sign_req.room_id.to_string(),
     )
-    .await;
+    .await
+    {
+        Ok(result) => result,
+        Err(error) => format!("error in sign {:?}", error),
+    };
+
+    println!("sign_result {:?}", sign_result);
 
     "Server Good"
 }
