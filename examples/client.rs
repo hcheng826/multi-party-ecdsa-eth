@@ -2,7 +2,7 @@
 extern crate rocket;
 use reqwest::Client;
 mod gg20_signing;
-use std::{path::PathBuf};
+use std::path::PathBuf;
 use tokio::task;
 use uuid::Uuid;
 
@@ -20,7 +20,7 @@ async fn send_tx(serialized_tx: &str) -> String {
         PathBuf::from(r"./examples/local-share1.json"),
         vec![1, 2],
         surf::Url::parse("http://localhost:8000").unwrap(),
-        // surf::Url::parse("http://1aef-60-250-148-100.ngrok.io").unwrap(),
+        // surf::Url::parse("https://4759-60-250-148-100.jp.ngrok.io").unwrap(),
         room_id.to_string(),
     ));
     let serialized_tx_clone = serialized_tx.to_string();
@@ -32,11 +32,10 @@ async fn send_tx(serialized_tx: &str) -> String {
         body.insert("room_id", room_id.to_string());
         let _res = client
             .post("http://localhost:8002/sign")
-            // .post("http://8f7f-60-250-148-100.ngrok.io/sign")
+            // .post("https://d56b-60-250-148-100.jp.ngrok.io/sign")
             .json(&body)
             .send()
-            .expect("REASON")
-            .text();
+            .await;
     });
 
     let (sign_task_result, req_result) = tokio::join!(sign_task, req_server_sign_task);
