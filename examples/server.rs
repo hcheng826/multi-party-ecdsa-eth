@@ -23,6 +23,7 @@ async fn sign(sign_req: Json<SignReq>) -> &'static str {
         PathBuf::from(r"./examples/local-share2.json"),
         vec![1, 2],
         surf::Url::parse("http://localhost:8000").unwrap(),
+        // surf::Url::parse("https://4759-60-250-148-100.jp.ngrok.io").unwrap(),
         sign_req.room_id.to_string(),
     )
     .await
