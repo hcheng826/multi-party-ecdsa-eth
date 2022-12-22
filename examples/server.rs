@@ -40,13 +40,19 @@ async fn sign(sign_req: Json<SignReq>) -> &'static str {
     "Server Good"
 }
 
+/// Catches all OPTION requests in order to get the CORS related Fairing triggered.
+#[options("/<_..>")]
+fn all_options() {
+    /* Intentionally left empty */
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let figment = rocket::Config::figment().merge(("port", 8002));
     let _rocket_instance = rocket::custom(figment)
         .attach(Cors)
         .mount("/", routes![index])
-        .mount("/sign", routes![sign])
+        .mount("/sign", routes![sign, all_options])
         .launch()
         .await?;
     Ok(())
