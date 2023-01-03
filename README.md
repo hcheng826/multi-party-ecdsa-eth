@@ -1,6 +1,7 @@
 # Multi-party ECDSA for Ethereum transaction prototype
 
 ## Introdutcion
+![backend tss](https://user-images.githubusercontent.com/23033847/210301775-f091faa9-ef02-451b-b515-a9b9f36a627b.jpeg)
 
 4 components
 
