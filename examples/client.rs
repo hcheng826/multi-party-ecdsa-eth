@@ -58,7 +58,9 @@ async fn send_tx(serialized_tx: &str) -> String {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let figment = rocket::Config::figment().merge(("port", 8001));
+    let figment = rocket::Config::figment()
+        .merge(("port", 8001))
+        .merge(("address", "0.0.0.0"));
     let _rocket_instance = rocket::custom(figment)
         .mount("/", routes![index])
         .mount("/send-tx", routes![send_tx])

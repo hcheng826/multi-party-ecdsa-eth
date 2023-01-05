@@ -48,7 +48,9 @@ fn all_options() {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let figment = rocket::Config::figment().merge(("port", 8002));
+    let figment = rocket::Config::figment()
+        .merge(("port", 8002))
+        .merge(("address", "0.0.0.0"));
     let _rocket_instance = rocket::custom(figment)
         .attach(Cors)
         .mount("/", routes![index])

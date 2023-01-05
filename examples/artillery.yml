@@ -1,0 +1,24 @@
+config:
+  target: 'http://192.168.1.62:8001'
+  # target: 'http://127.0.0.1:8001'
+  plugins:
+    expect: {}
+  phases:
+    - duration: 5
+      arrivalRate: 1000
+      name: tss test
+
+scenarios:
+  - name: 'send transaction'
+    flow:
+      # - get:
+      #     url: '/'
+
+      - post:
+          url: '/send-tx/'
+          body:
+            'db78d0662216f07cac8d3417a01bbbfdb3c5d750c44f85e6722ed1b8b5afe6ea'
+          headers:
+            Content-Type: "text/plain"
+          expect:
+            - statusCode: 200
